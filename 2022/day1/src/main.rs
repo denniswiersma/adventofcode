@@ -3,7 +3,7 @@ use std::fs;
 fn main() {
     let lines = read_lines("input/input.txt");
 
-    let totals_per_elf: Vec<u32> = lines.iter()
+    let mut totals_per_elf: Vec<u32> = lines.iter()
         .map(|elf| elf.iter().sum())
         .collect();
 
@@ -11,7 +11,16 @@ fn main() {
         .max()
         .unwrap();
 
-    println!("{:?}", elf_with_most)
+    println!("part 1\ncalories of elf with most: {:?}", elf_with_most);
+
+    totals_per_elf.sort_by(|a, b| b.cmp(a));
+    let top_three = &totals_per_elf[0..3];
+
+    let top_three_total: u32 = top_three.iter()
+        .sum();
+
+
+    println!("part 2\ncalories of top three elves: {:?}", top_three_total)
 }
 
 fn read_lines(filename: &str) -> Vec<Vec<u32>> {
