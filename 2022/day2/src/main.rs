@@ -1,11 +1,19 @@
 use std::fs;
 
-fn read_lines(filename: &str) -> Vec<RPSgame> {
-    fs::read_to_string(filename)
-        .unwrap()
-        .lines()
-        .map(|l| line_to_game(l))
-        .collect()
+fn read_lines(filename: &str, part: u8) -> Vec<RPSgame> {
+    match part {
+        1 => fs::read_to_string(filename)
+            .unwrap()
+            .lines()
+            .map(|l| line_to_game(l))
+            .collect(),
+        2 => fs::read_to_string(filename)
+            .unwrap()
+            .lines()
+            .map(|l| line_to_game_part2(l))
+            .collect(),
+        _ => panic!("Invalid part")
+    }
 }
 
 fn line_to_game(line: &str) -> RPSgame {
@@ -32,6 +40,31 @@ fn line_to_game(line: &str) -> RPSgame {
     ];
 
     RPSgame { opponent: game[0], me: game[1] }
+}
+
+fn line_to_game_part2(line: &str) -> RPSgame {
+    let split_line: Vec<char> = line.split(' ')
+        .filter_map(|s| s.chars().next())
+        .collect();
+
+    let opponent = split_line[0];
+    let outcome = split_line[1];
+
+    let opponent_shape = match opponent {
+        'A' => Shape::Rock,
+        'B' => Shape::Paper,
+        'C' => Shape::Scissors,
+        _ => panic!("Invalid opponent shape")
+    };
+
+    let my_hand = match (opponent_shape, outcome) {
+        (Shape::Paper, 'X') | (Shape::Rock, 'Y') | (Shape::Scissors, 'Z') => Shape::Rock,
+        (Shape::Scissors, 'X') | (Shape::Paper, 'Y') | (Shape::Rock, 'Z') => Shape::Paper,
+        (Shape::Rock, 'X') | (Shape::Scissors, 'Y') | (Shape::Paper, 'Z') => Shape::Scissors,
+        _ => panic!("Invalid shapes")
+    };
+
+    RPSgame { opponent: opponent_shape, me: my_hand }
 }
 
 #[derive(Copy, Clone)]
@@ -68,7 +101,7 @@ fn calculate_match_score(game: RPSgame) -> u32 {
 }
 
 fn main() {
-    let games = read_lines("input/input.txt");
+    let games = read_lines("input/input.txt", 1);
 
     let mut total_score = 0;
 
@@ -76,6 +109,16 @@ fn main() {
         total_score += calculate_match_score(game);
     };
 
-    println!("total score: {}", total_score)
+    println!("part1\ntotal score: {}", total_score);
+
+    let games = read_lines("input/input.txt", 2);
+
+    let mut total_score = 0;
+
+    for game in games {
+        total_score += calculate_match_score(game);
+    };
+
+    println!("part2\ntotal score: {}", total_score);
 
 }
