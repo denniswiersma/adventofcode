@@ -9,14 +9,12 @@ fn read_lines(filename: &str) -> Vec<String> {
 }
 
 fn find_duplicate(input: String) -> Option<char>{
-    let mut checked = Vec::new();
+    let split_point = input.chars().count() / 2;
+    let (comp1, comp2) = input.split_at(split_point);
 
-    for letter in input.chars() {
-        if !checked.contains(&letter) {
-            checked.push(letter);
-        }
-        else {
-            return Some(letter);
+    for letter in comp1.chars() {
+        if comp2.contains(letter) {
+            return Some(letter)
         }
     }
     None
