@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, collections::HashSet};
 
 fn read_lines(filename: &str) -> Vec<String> {
     fs::read_to_string(filename)
@@ -8,7 +8,7 @@ fn read_lines(filename: &str) -> Vec<String> {
         .collect()
 }
 
-fn find_duplicate(input: String) -> Option<char>{
+fn find_duplicate(input: &String) -> Option<char>{
     let split_point = input.chars().count() / 2;
     let (comp1, comp2) = input.split_at(split_point);
 
@@ -20,6 +20,27 @@ fn find_duplicate(input: String) -> Option<char>{
     None
 }
 
+fn find_badge(rucksacks: Vec<String>) -> Vec<char> {
+    let mut badges = Vec::new();
+
+    for i in (0..rucksacks.len()).step_by(3) {
+        let elf1 = &rucksacks[i];
+        let elf2 = &rucksacks[i + 1];
+        let elf3 = &rucksacks[i + 2];
+
+        let mut checked = HashSet::new();
+
+
+        for letter in elf1.chars() {
+            if !checked.contains(&letter) && elf2.contains(letter) && elf3.contains(letter) {
+                badges.push(letter);
+                checked.insert(letter);
+            }
+        }
+    }
+    return badges;
+}
+
 fn char_to_num(letter: char) -> u32 {
     match letter {
         'a'..='z' => (letter as u32) - 96, // since ASCII of 'a' is 97 and 'a' should equal 1
@@ -29,10 +50,11 @@ fn char_to_num(letter: char) -> u32 {
 }
 
 fn main() {
+    // part 1
     let lines: Vec<String> = read_lines("input/input.txt");
 
     let mut duplicates: Vec<char> = Vec::new();
-    for line in lines {
+    for line in &lines {
         duplicates.push(find_duplicate(line).unwrap())
     }
 
@@ -41,5 +63,16 @@ fn main() {
         .map(|dup| char_to_num(*dup))
         .sum();
 
-    println!("{}", sum)
+    println!("part1: {}", sum);
+
+    // part 2
+    let badges = find_badge(lines);
+
+    let sum: u32 = badges
+        .iter()
+        .map(|badge| char_to_num(*badge))
+        .sum();
+
+    println!("part2: {}", sum)
+
 }
